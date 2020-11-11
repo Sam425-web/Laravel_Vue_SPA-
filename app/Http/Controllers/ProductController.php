@@ -21,20 +21,19 @@ class ProductController extends Controller
         return Product::create($request->only('name','price'));
     }
 
-    public function show($id)
+    public function show(Product $product)
     {
-        return Product::find($id);
+        return $product;
     }
 
-    public function update(ProductUpdateRequest $request, $id)
+    public function update(ProductUpdateRequest $request, Product $product)
     {
-        $product = Product::find($id);
         $product->update($request->all());
         return $product;
     }
 
-    public function destroy($id)
+    public function destroy(Product $product)
     {
-        Product::destroy($id);
+        $product->delete();
     }
 }
