@@ -1982,19 +1982,90 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "ProductComponent",
   data: function data() {
     return {
-      products: []
+      isEditMode: false,
+      products: [],
+      product: {
+        id: "",
+        name: "",
+        price: ""
+      }
     };
   },
-  created: function created() {
-    var _this = this;
+  methods: {
+    view: function view() {
+      var _this = this;
 
-    axios.get("/api/products").then(function (response) {
-      _this.products = response.data;
-    });
+      axios.get("/api/products").then(function (response) {
+        _this.products = response.data;
+      });
+    },
+    create: function create() {
+      this.isEditMode = false;
+      this.product.id = "";
+      this.product.name = "";
+      this.product.price = "";
+    },
+    edit: function edit(product) {
+      this.isEditMode = true;
+      this.product.id = product.id;
+      this.product.name = product.name;
+      this.product.price = product.price;
+    },
+    update: function update() {
+      var _this2 = this;
+
+      axios.put("/api/products/".concat(this.product.id), this.product).then(function (response) {
+        _this2.view();
+
+        _this2.product.id = "";
+        _this2.product.name = "";
+        _this2.product.price = "";
+      });
+    },
+    store: function store() {
+      var _this3 = this;
+
+      axios.post("/api/products", this.product).then(function (response) {
+        _this3.view();
+
+        _this3.product = {
+          name: "",
+          price: ""
+        };
+      });
+    },
+    destory: function destory(id) {
+      var _this4 = this;
+
+      if (!confirm("Are u Sure to Delete?")) {
+        return;
+      }
+
+      axios["delete"]("/api/products/".concat(id)).then(function (response) {
+        return _this4.view();
+      });
+    }
+  },
+  created: function created() {
+    this.view();
   }
 });
 
@@ -37591,10 +37662,98 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "container mt-5" }, [
-    _vm._m(0),
+    _c("div", { staticClass: "row justify-content-end" }, [
+      _c("div", { staticClass: "col-4" }, [
+        _c(
+          "button",
+          { staticClass: "btn btn-info", on: { click: _vm.create } },
+          [
+            _c("i", { staticClass: "fas fa-plus" }),
+            _vm._v("\n        Create\n      ")
+          ]
+        )
+      ]),
+      _vm._v(" "),
+      _vm._m(0)
+    ]),
     _vm._v(" "),
     _c("div", { staticClass: "row" }, [
-      _vm._m(1),
+      _c("div", { staticClass: "col-4" }, [
+        _c("div", { staticClass: "card" }, [
+          _c("div", { staticClass: "card-header" }, [
+            _c("h4", [_vm._v(_vm._s(_vm.isEditMode ? "Edit" : "Create"))])
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "card-body" }, [
+            _c(
+              "form",
+              {
+                on: {
+                  submit: function($event) {
+                    $event.preventDefault()
+                    _vm.isEditMode ? _vm.update() : _vm.store()
+                  }
+                }
+              },
+              [
+                _c("div", { staticClass: "form-group" }, [
+                  _c("label", [_vm._v("Name:")]),
+                  _vm._v(" "),
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.product.name,
+                        expression: "product.name"
+                      }
+                    ],
+                    staticClass: "form-control",
+                    attrs: { type: "text" },
+                    domProps: { value: _vm.product.name },
+                    on: {
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.$set(_vm.product, "name", $event.target.value)
+                      }
+                    }
+                  })
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "form-group" }, [
+                  _c("label", [_vm._v("Price:")]),
+                  _vm._v(" "),
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.product.price,
+                        expression: "product.price"
+                      }
+                    ],
+                    staticClass: "form-control",
+                    attrs: { type: "number" },
+                    domProps: { value: _vm.product.price },
+                    on: {
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.$set(_vm.product, "price", $event.target.value)
+                      }
+                    }
+                  })
+                ]),
+                _vm._v(" "),
+                _vm._m(1)
+              ]
+            )
+          ])
+        ])
+      ]),
       _vm._v(" "),
       _c("div", { staticClass: "col-8" }, [
         _c("table", { staticClass: "table table-striped" }, [
@@ -37612,7 +37771,33 @@ var render = function() {
                 _vm._v(" "),
                 _c("td", [_vm._v(_vm._s(product.price))]),
                 _vm._v(" "),
-                _vm._m(3, true)
+                _c("td", [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-success btn-sm",
+                      on: {
+                        click: function($event) {
+                          return _vm.edit(product)
+                        }
+                      }
+                    },
+                    [_c("i", { staticClass: "fas fa-edit" })]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-danger btn-sm",
+                      on: {
+                        click: function($event) {
+                          return _vm.destory(product.id)
+                        }
+                      }
+                    },
+                    [_c("i", { staticClass: "fas fa-trash" })]
+                  )
+                ])
               ])
             }),
             0
@@ -37627,31 +37812,22 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "row justify-content-end" }, [
-      _c("div", { staticClass: "col-4" }, [
-        _c("button", { staticClass: "btn btn-info" }, [
-          _c("i", { staticClass: "fas fa-plus" }),
-          _vm._v("\n        Create\n      ")
-        ])
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-4" }, [
-        _c("div", { staticClass: "input-group mb-3" }, [
-          _c("input", {
-            staticClass: "form-control",
-            attrs: { type: "text", placeholder: "Search Name" }
-          }),
-          _vm._v(" "),
-          _c("div", { staticClass: "input-group-append" }, [
-            _c(
-              "button",
-              {
-                staticClass: "btn btn-primary",
-                attrs: { type: "button", id: "button-addon2" }
-              },
-              [_c("i", { staticClass: "fas fa-search" })]
-            )
-          ])
+    return _c("div", { staticClass: "col-4" }, [
+      _c("div", { staticClass: "input-group mb-3" }, [
+        _c("input", {
+          staticClass: "form-control",
+          attrs: { type: "text", placeholder: "Search Name" }
+        }),
+        _vm._v(" "),
+        _c("div", { staticClass: "input-group-append" }, [
+          _c(
+            "button",
+            {
+              staticClass: "btn btn-primary",
+              attrs: { type: "button", id: "button-addon2" }
+            },
+            [_c("i", { staticClass: "fas fa-search" })]
+          )
         ])
       ])
     ])
@@ -37660,35 +37836,11 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "col-4" }, [
-      _c("div", { staticClass: "card" }, [
-        _c("div", { staticClass: "card-header" }, [
-          _c("h4", [_vm._v("Create")])
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "card-body" }, [
-          _c("form", { attrs: { action: "" } }, [
-            _c("div", { staticClass: "form-group" }, [
-              _c("label", [_vm._v("Name:")]),
-              _vm._v(" "),
-              _c("input", {
-                staticClass: "form-control",
-                attrs: { type: "text" }
-              })
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "form-group" }, [
-              _c("label", [_vm._v("Price:")]),
-              _vm._v(" "),
-              _c("input", {
-                staticClass: "form-control",
-                attrs: { type: "number" }
-              })
-            ])
-          ])
-        ])
-      ])
-    ])
+    return _c(
+      "button",
+      { staticClass: "btn btn-block btn-info", attrs: { type: "submit" } },
+      [_c("i", { staticClass: "fas fa-save" }), _vm._v(" Save\n            ")]
+    )
   },
   function() {
     var _vm = this
@@ -37703,20 +37855,6 @@ var staticRenderFns = [
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Price")]),
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Action")])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("td", [
-      _c("button", { staticClass: "btn btn-success btn-sm" }, [
-        _c("i", { staticClass: "fas fa-edit" })
-      ]),
-      _vm._v(" "),
-      _c("button", { staticClass: "btn btn-danger btn-sm" }, [
-        _c("i", { staticClass: "fas fa-trash" })
       ])
     ])
   }
